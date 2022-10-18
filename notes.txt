@@ -1,0 +1,147 @@
+
+
+DSL2 
+- NXL_VER>=22 will use DSL2 as default
+- if before v22.0.0 you have to specify the document uses DSL2
+
+PROCESS 
+- written in any scripting language that can be executed by the Linux platform 
+  (Bash, Perl, Ruby, Python, etc.)
+
+DATA TYPES
+- val         Lets you access the received input value by its name in the process script. 
+- env         Lets you use the received value to set an environment variable named as the specified input name. 
+- file        Lets you handle the received value as a file, staging it properly in the execution context.  
+- path        Lets you handle the received value as a path, staging the file properly in the execution context. 
+- stdin       Lets you forward the received value to the process stdin special file.  
+- tuple       Lets you handle a group of input values having one of the above qualifiers.  
+- each        Lets you execute the process for each entry in the input collection.
+
+CHANNELS 
+- queue channel:
+    - only way processes can pass data
+    - asynchronous first-in, first-out (FIFO) queues
+    - Any process can define one or more channels as an input and output
+    - pipeline execution flow itself, is implicitly defined by these input and output declarations
+    - If you need to connect a process output channel to more than one process or operator,
+    use the 'into' operator to create two (or more) copies of the same channel. These can be used to connect a separate process.
+- value channel:
+    - like a STATIC VARIABLE
+    - singleton channel
+    - bound to single value
+    - read unlimited times without consuming its content 
+- creating channels
+    - queue:
+        - factory method such as a 'from', 'fromPath' keywords
+        - channel operator such as map, flatMap
+        - 'into' keyword - "output: file 'x.txt' into result"
+    - value:
+        - value factory method - "expl1 = Channel.value( 'Hello there' )"
+        - operators returning a single value, such us first, last, collect, count, min, max, reduce, sum
+    - implicit: 
+        - "input: val x from 1" will implicitly create channel to wrap the value 1. 
+
+CHANNEL METHODS TO SUPPORT
+- creation:
+    - .from             Channel.from( [1, 3, 5, 7, 9] ) or Channel.from( 1, 3, 5, 7, 9 ) (same result due to java shit)
+    - .fromList         Channel.fromList( ['a', 'b', 'c', 'd'] )
+    - .fromPath         Channel.fromPath( '/data/**/*.txt' )                    <- glob pattern ok!
+    - .fromFilePairs    Channel.fromFilePairs('/my/data/SRR*_{1,2}.fastq')  checkIfExists: true - will ensure filepaths are valid
+    - .value            Channel.value( 'Hello there' )
+    - .empty            Channel.empty()   <- creates empty channel
+- filters:
+    - .filter( ~/^a.*/ )        filter by regular expression
+    - .unique()                 remove duplicate items from a channel. 
+    - .unique { it % 2 }        specify an optional closure that customizes the way it distinguishes between unique items
+    - .first()                  filter first
+    - .first( String )          filter first satisfying a type
+    - .first( ~/aa.*/ )         filter first satisfying a pattern
+    - .first { it > 3 }         filter first satisfying a closure
+    - .take(n)                  filter the first n items
+    - .last(n)                  filter last n elements - same as .first()
+- transforming: 
+    - .map {}           apply function of your choosing to every item emitted by a channel. return new channel.
+    - .collate(n)       group in tuples containing n items
+    - .collect()        merges each item in channel and return as a tuple. Channel.from(1,2,3,4).collect().view() -> [1,2,3,4]
+    - .flatten()        flatten any tuple structure into single items. Channel.from([1,[2,3]],4,[5,[6]]).flatten().view() -> 1 2 3 4 5 6
+    - .groupTuple()     Channel.from( [1,'A'], [1,'B'], [2,'C'], [2, 'A']).groupTuple().view()
+                        [1, [A, B]]
+                        [2, [C, A]]
+    - .toList()         identical to collect() operator?
+    - .toSortedList()   identical to .toList() but sorts 
+    - .transpose()      perform transposition
+- splitting:
+    - .splitCsv()       split a csv file. accepts header, sep, quote, strip, limit etc parameters
+    - .splitFasta()     split a Fasta to each sequence. has parameters
+    - .splitFastq()     split a Fastq to each sequence. has parameters
+    - .splitText()      split lines of a text file. has parameters. 
+- combining:
+    - .cross()
+    - .collectFile()
+    - .combine()
+    - .concat()
+    - .join()
+    - .mix()
+- forking:
+    - .into()
+    - .separate()
+- maths:
+    - .count()
+    - .min()
+    - .max()
+    - .sum()
+    - .toInteger()
+- misc:
+    - .close()
+    - .dump()
+    - .ifEmpty()
+    - .view()
+    - .subscribe{}      execute user-defined function each time a new value is emitted by channel. kinda replaces a process{}
+
+FUTURE
+    - .filter()                 regular expression, a literal value, a type, or any boolean closure
+    - .filter( Number )         filter by type
+    - .filter { it % 2 == 1 }   filter by closure
+
+
+
+GROOVY NOTES
+- nextflow documents seem to be written in groovy with a DSL layer on top
+- eg """   hello """.stripIndent() is seen  - this method is groovy. 
+- newline format has to be roughly followed, except when things are single values.
+- eg "inputs: path file1" works, but "inputs: path file1 path file2" fails. 
+
+IMPORTS 
+- include { convertToUpper } from './modules.nf'
+
+VARIABLES
+- {} syntax to access a variable
+- channel.view{ it }
+- include { convertToUpper } from './modules.nf'
+
+BUILTIN VARIABLES
+- $projectDir - where the nextflow project is located
+
+WORKFLOW METHODS
+- .onComplete { }
+
+
+ODDITIES
+
+nextflow has template processes? see below. from ampliseq workflow
+workflow.onComplete {
+    if (params.email || params.email_on_fail) {
+        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+    }
+    NfcoreTemplate.summary(workflow, params, log)
+}
+
+NfcoreSchema
+
+WorkflowBactmap.initialise(params, log)
+-  can somehow call a workflow object's initialise function 
+
+addParams(name: value) adds variables in the local namespace to an imported module namespace. 
+
+
+

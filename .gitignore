@@ -1,0 +1,6 @@
+catalogue
+data
+venv
+work
+.command*
+.nextflow*
