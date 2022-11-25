@@ -50,15 +50,4 @@ process SCATTER_CROSS {
     """
 }
 
-process SCATTER_CROSS_TUPLE {
-    input:
-    tuple path(bam), path(bai)
-
-    output:
-    tuple path(bam), path(bai)
-
-    script:
-    """
-    """
-}
 
