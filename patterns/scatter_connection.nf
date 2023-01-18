@@ -15,7 +15,7 @@ ch_files = Channel.fromPath(params.files)
 // array -> singles
 workflow {
     COMPONENTS1_ARRAY(ch_files.collect())
-    COMPONENTS2(COMPONENTS1_ARRAY.out.out.flatten())
+    COMPONENTS2(COMPONENTS1_ARRAY.out.out.flatten)
     COMPONENTS2.out.out.view()
 }
 

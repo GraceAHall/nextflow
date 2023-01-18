@@ -1,0 +1,48 @@
+
+
+
+params.bambais = [
+    ['../data/aln1.sorted.bam', '../data/aln1.sorted.bai'],
+    ['../data/aln2.sorted.bam', '../data/aln2.sorted.bai']
+]
+
+ch_bambais = Channel.fromPath( params.bambais.flatten() ).buffer( size: 2 ).view()
+
+
+
+plumbing situations
+
+Array -> Array
+- array -> array
+- do nothing
+
+Array -> Single (no scatter)
+- flatten() to make individual elements in channel
+- take first 
+
+Single -> Array
+- collect() to turn single item emission into array with 1 item
+
+Scatter -> Scatter
+- singles -> array, array -> singles
+- collect() to collect previous step results back into array
+- flatten() to create single element emissions
+
+Scatter -> Array
+- singles -> array
+- collect() to collect previous step results back into array
+
+Array -> Scatter
+- array -> singles
+- flatten() to create single element emissions
+
+Scatter -> SubScatter
+- singles -> singles
+- do nothing
+
+SecondaryArray
+
+
+ScatterSecondaryArray
+
+

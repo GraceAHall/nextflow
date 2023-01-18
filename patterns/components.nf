@@ -10,7 +10,7 @@ nextflow.enable.dsl=2
 // params.opt_default     = 100
 // params.opt_optional    = ''
 
-params.pos_basic       = '../data/wildtype.fna'
+// params.pos_basic       = '../data/wildtype.fna'
 params.pos_default     = null
 params.pos_optional    = null
 params.flag_true       = null
@@ -19,7 +19,7 @@ params.opt_basic       = 'static'
 params.opt_default     = null
 params.opt_optional    = null
 
-ch_files = Channel.fromPath(params.pos_basic)
+ch_files = Channel.fromPath(params.components.pos_basic.ok)
 
 workflow {
     COMPONENTS(ch_files).view{ it }
