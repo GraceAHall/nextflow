@@ -11,8 +11,68 @@ ch_bambais = Channel.fromPath( params.bambais.flatten() ).buffer( size: 2 ).view
 
 
 plumbing situations
+- cannot do flatten() with array secondaries!!!
 
-Array -> Array
+
+datatype mismatches:
+
+Array -> Single (no scatter)
+Single -> Array
+
+SecondaryArray -> Secondary(no scatter)
+Secondary -> SecondaryArray
+
+
+Scatter:
+
+Scatter(Array) -> Scatter(Array)
+Scatter(Array) -> Single
+Scatter(Array) -> Array
+Array -> Scatter(Array)
+
+Scatter(SecondaryArray) -> Scatter(SecondaryArray)
+Scatter(SecondaryArray) -> SecondaryArray
+Scatter(SecondaryArray) -> Secondary
+SecondaryArray -> Scatter(SecondaryArray)
+
+
+
+Array -> Single (no scatter)
+- flatten() to make individual elements in channel
+- take first 
+
+Single -> Array
+- collect() to turn single item emission into array with 1 item
+
+
+
+
+Scatter -> Scatter
+- singles -> array, array -> singles
+- collect() to collect previous step results back into array
+- flatten() to create single element emissions
+- cannot do with array secondaries
+
+Scatter -> Array
+- singles -> array
+- collect() to collect previous step results back into array
+
+Array -> Scatter
+- array -> singles
+- flatten() to create single element emissions
+
+Scatter -> SubScatter
+- singles -> singles
+- do nothing
+
+
+Secondaries:
+
+SecondaryArray -> SecondaryArray
+- array -> array
+- do nothing
+
+Secondary -> Secondary
 - array -> array
 - do nothing
 
@@ -27,6 +87,7 @@ Scatter -> Scatter
 - singles -> array, array -> singles
 - collect() to collect previous step results back into array
 - flatten() to create single element emissions
+- cannot do with array secondaries
 
 Scatter -> Array
 - singles -> array
@@ -40,9 +101,7 @@ Scatter -> SubScatter
 - singles -> singles
 - do nothing
 
+
 SecondaryArray
-
-
-ScatterSecondaryArray
 
 
