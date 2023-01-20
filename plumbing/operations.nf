@@ -6,7 +6,7 @@ params.bambais = [
     ['../data/aln2.sorted.bam', '../data/aln2.sorted.bai']
 ]
 ch_secondary_array = Channel.fromPath( params.bambais.flatten() ).collate( 2 ).toList()
-ch_array = Channel.of([1, 2]).collect() 
+ch_array = Channel.of([1, 2]).toList() 
 ch_single = Channel.of( 1 )
 ch_secondary = Channel.fromPath( ['../data/aln2.sorted.bam', '../data/aln2.sorted.bai'] ).toList()
 
@@ -48,37 +48,24 @@ ch_secondary = Channel.fromPath( ['../data/aln2.sorted.bam', '../data/aln2.sorte
 // // primary files are recovered as array using get_primary_files()
 // workflow {
 //     ch_stp1_out = ch_secondary
-//     ch_stp2_in = ch_stp1_out.flatten().collect()
+//     ch_stp2_in = ch_stp1_out.flatten().toList()
 //     ch_stp1_out.view{ 'stp1 out: ' + it }
 //     ch_stp2_in.view{ 'stp2 in: ' + it }    
-//     SECONDARY_ARRAY(ch_stp1_out.flatten().collect())
+//     SECONDARY_ARRAY(ch_stp1_out.flatten().toList())
 //     SECONDARY_ARRAY.out.bams.view{ 'stp2 out: ' + it }
 // }
 
 
-
-
-// SCATTER DOT
+// // SCATTER DOT
 // // Scatter(Array) -> Scatter(Array)
 // // all stp1 jobs must complete & are gathered before stp2 starts.
 // workflow {
-//     ch_stp1_out = ch_array.flatten()
+//     ch_stp1_out = ch_array.flatten()            
 //     ch_stp2_in = ch_stp1_out.toList().flatten()
 //     ch_stp1_out.view{ 'stp1 out: ' + it }
 //     ch_stp2_in.view{ 'stp2 in: ' + it }    
 //     ARRAY(ch_stp1_out.toList().flatten())
 //     ARRAY.out.view{ 'stp2 out: ' + it }
-// }
-
-// // Scatter(Array) -> Single (SubScatter)
-// // stp2 happens directly after each stp1 job completes
-// workflow {
-//     ch_stp1_out = ch_array.flatten()
-//     ch_stp2_in = ch_stp1_out     
-//     ch_stp1_out.view{ 'stp1 out: ' + it }
-//     ch_stp2_in.view{ 'stp2 in: ' + it }            
-//     SINGLE(ch_stp1_out)
-//     SINGLE.out.view{ 'stp2 out: ' + it }
 // }
 
 // // Scatter(Array) -> Array
@@ -101,8 +88,6 @@ ch_secondary = Channel.fromPath( ['../data/aln2.sorted.bam', '../data/aln2.sorte
 //     SINGLE.out.view{ 'stp2 out: ' + it }
 // }
 
-
-
 // // Scatter(SecondaryArray) -> Scatter(SecondaryArray) 
 // // all stp1 jobs must complete & are gathered before first stp2 job starts.
 // workflow {
@@ -114,24 +99,13 @@ ch_secondary = Channel.fromPath( ['../data/aln2.sorted.bam', '../data/aln2.sorte
 //     SECONDARY.out.view{ 'stp2 out: ' + it }
 // }
 
-// // Scatter(SecondaryArray) -> Secondary
-// // stp2 job happens directly after each stp1 job is completed
-// workflow {
-//     ch_stp1_out = ch_secondary_array.flatten().collate( 2 ) // step1 output
-//     ch_stp2_inp = ch_stp1_out                               // step2 input
-//     ch_stp1_out.view{ 'stp1 out: ' + it }
-//     ch_stp2_inp.view{ 'stp2 inp: ' + it }
-//     SECONDARY(ch_stp1_out)
-//     SECONDARY.out.view{ 'stp2 out: ' + it }
-// }
-
 // // Scatter(SecondaryArray) -> SecondaryArray
 // workflow {
 //     ch_stp1_out = ch_secondary_array.flatten().collate( 2 ) // step1 output
-//     ch_stp2_inp = ch_stp1_out.flatten().collect()           // step2 input
+//     ch_stp2_inp = ch_stp1_out.flatten().toList()           // step2 input
 //     ch_stp1_out.view{ 'stp1 out: ' + it }
 //     ch_stp2_inp.view{ 'stp2 inp: ' + it }
-//     SECONDARY_ARRAY(ch_stp1_out.flatten().collect())
+//     SECONDARY_ARRAY(ch_stp1_out.flatten().toList())
 //     SECONDARY_ARRAY.out.bams.view{ 'stp2 out: ' + it }
 // }
 
