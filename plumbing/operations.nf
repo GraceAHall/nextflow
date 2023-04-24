@@ -11,6 +11,7 @@ ch_single = Channel.of( 1 )
 ch_secondary = Channel.fromPath( ['../data/aln2.sorted.bam', '../data/aln2.sorted.bai'] ).toList()
 
 
+
 // DATATYPE MISMATCHES:
 
 // // Array -> Single (no scatter)
@@ -128,7 +129,7 @@ process SINGLE {
     val inp
 
     output:
-    val inp
+    val inp, emit: out
 
     script:
     """

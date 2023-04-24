@@ -1,0 +1,7 @@
+{
+    "out_int": 52,
+    "out_string": "lmao",
+    "out_dict": {
+        "key1": "val1"
+    }
+}

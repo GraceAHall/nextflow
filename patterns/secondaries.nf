@@ -15,10 +15,7 @@ ch_in_alignments = Channel.fromPath([
                     .collect()
 
 workflow {
-    SECONDARIES(
-        ch_bam,
-        ch_bai,
-    ).view{ it }
+    SECONDARIES(ch_in_alignments).view()
 }
 
 process SECONDARIES {
